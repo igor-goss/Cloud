@@ -26,6 +26,8 @@ namespace WebApplication2.Controllers
             {
                 _context.Add(user);
                 await _context.SaveChangesAsync();
+                System.IO.File.WriteAllText(@"C:\\Кодинг\\Cloud\\WebApplication2\\WebApplication2\temp.txt", string.Empty);
+                System.IO.File.WriteAllText(@"C:\\Кодинг\\Cloud\\WebApplication2\\WebApplication2\temp.txt", user.Id.ToString());
                 return RedirectToAction(nameof(Index));
             }
 

@@ -14,6 +14,7 @@ namespace WebApplication2.Data
         {
         }
 
-        public DbSet<WebApplication2.Models.File> File { get; set; } = default!;
+        public DbSet<Models.File> File { get; set; } = default!;
+        public DbSet<Models.User> User { get; set; } = default!;
     }
 }

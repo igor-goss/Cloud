@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WebApplication2.Models
 {
@@ -10,7 +11,12 @@ namespace WebApplication2.Models
         [DataType(DataType.Date)]
         public DateTime? DateCreated { get; set; }
 
-        [DataType(DataType.Date)]
-        public DateTime? DateModified { get; set; }
+        public byte[]? Content { get; set; }
+
+        [ForeignKey(nameof(User.Id))]
+        public int UserId { get; set; }
+
+        //[DataType(DataType.Date)]
+        //public DateTime? DateModified { get; set; }
     }
 }

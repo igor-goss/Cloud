@@ -6,25 +6,33 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WebApplication2.Data;
+using System.Web;
 using WebApplication2.Models;
+using System.IO;
 
 namespace WebApplication2.Controllers
 {
     public class FilesController : Controller
     {
         private readonly WebApplication2Context _context;
+        private int _userId;
 
         public FilesController(WebApplication2Context context)
         {
             _context = context;
+            _userId = int.Parse(System.IO.File.ReadAllText(@"C:\\Кодинг\\Cloud\\WebApplication2\\WebApplication2\temp.txt"));
         }
 
         // GET: Files
         public async Task<IActionResult> Index()
         {
-              return _context.File != null ? 
-                          View(await _context.File.ToListAsync()) :
-                          Problem("Entity set 'WebApplication2Context.File'  is null.");
+            var files = await _context.File.ToListAsync();
+            var userFiles = from file in files
+                            where file.UserId == _userId
+                            select file;
+            return _context.File != null ? 
+                View(userFiles) :
+                Problem("Entity set 'WebApplication2Context.File'  is null.");
         }
 
         // GET: Files/Details/5
@@ -56,16 +64,71 @@ namespace WebApplication2.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,path,DateCreated,DateModified")] Models.File @file)
+        public async Task<IActionResult> Create(/*[Bind("Id,path,DateCreated")] Models.File @file,*/ IFormFile file)
         {
-            if (ModelState.IsValid)
+
+            if (file != null && file.Length > 0)
             {
-                _context.Add(@file);
+                // Read the file content into a byte array
+                byte[] fileContent;
+                using (var memoryStream = new MemoryStream())
+                {
+                    file.CopyTo(memoryStream);
+                    fileContent = memoryStream.ToArray();
+                }
+
+                // Create a new instance of the file entity
+                var fileEntity = new Models.File
+                {
+                    path = file.FileName,
+                    DateCreated = DateTime.Now,
+                    Content = fileContent,
+                    UserId = _userId
+                    
+                };
+
+                // Save the file entity to the database
+                await _context.File.AddAsync(fileEntity);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+
+                // Optionally, you can return a success message or redirect to another page
+                ViewBag.Message = "File uploaded successfully.";
             }
-            return View(@file);
+            else
+            {
+                ViewBag.Message = "No file selected.";
+            }
+
+            return View();
+
+            
         }
+
+        //[HttpPost]
+        //public IActionResult Upload(IFormFile file)
+        //{
+        //    if (file != null && file.Length > 0)
+        //    {
+        //        // Process the uploaded file
+        //        // You can save the file to disk, store it in a database, or perform any other required operations
+        //        string fileName = Path.GetFileName(file.FileName);
+        //        string path = Path.Combine(Directory.GetCurrentDirectory(), "UploadedFiles", fileName);
+        //        using (var stream = new FileStream(path, FileMode.Create))
+        //        {
+        //            file.CopyTo(stream);
+        //        }
+
+        //        // Optionally, you can return a success message or redirect to another page
+        //        ViewBag.Message = "File uploaded successfully.";
+        //    }
+        //    else
+        //    {
+        //        ViewBag.Message = "No file selected.";
+        //    }
+
+        //    return View();
+        //}
+
 
         // GET: Files/Edit/5
         public async Task<IActionResult> Edit(int? id)

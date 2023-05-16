@@ -25,7 +25,7 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                <a asp-action="@item.path" asp-route-id="@item.Id">@item.path</a>
+                <a asp-action="Download" asp-route-id="@item.Id">@item.path</a>
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.DateCreated)

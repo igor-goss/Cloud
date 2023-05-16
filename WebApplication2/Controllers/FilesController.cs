@@ -9,6 +9,8 @@ using WebApplication2.Data;
 using System.Web;
 using WebApplication2.Models;
 using System.IO;
+using System.Text;
+using System.Reflection.Metadata.Ecma335;
 
 namespace WebApplication2.Controllers
 {
@@ -102,6 +104,109 @@ namespace WebApplication2.Controllers
             return View();
 
             
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Download(int id)
+        {
+            //string filePath = Path.Combine(Directory.GetCurrentDirectory(), "tempFile");
+
+            var file = _context.File.FirstOrDefault(f => f.Id == id);
+
+            //using (var stream = System.IO.File.Open(filePath, FileMode.Create))
+            //{
+            //    using (var writer = new BinaryWriter(stream, Encoding.UTF8, false))
+            //    {
+            //        writer.Write(file.Content);
+            //    }
+            //}
+
+            string fileExtension = Path.GetExtension(file.path);
+
+
+
+            string contentType = string.Empty;
+
+            switch (fileExtension.ToLower())
+            {
+                case ".txt":
+                    contentType = "text/plain";
+                    break;
+                case ".csv":
+                    contentType = "text/csv";
+                    break;
+                case ".xml":
+                    contentType = "text/xml";
+                    break;
+                case ".html":
+                    contentType = "text/html";
+                    break;
+                case ".json":
+                    contentType = "application/json";
+                    break;
+                case ".pdf":
+                    contentType = "application/pdf";
+                    break;
+                case ".zip":
+                    contentType = "application/zip";
+                    break;
+                case ".xls":
+                    contentType = "application/vnd.ms-excel";
+                    break;
+                case ".doc":
+                    contentType = "application/msword";
+                    break;
+                case ".ppt":
+                    contentType = "application/vnd.ms-powerpoint";
+                    break;
+                case ".xlsx":
+                    contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                    break;
+                case ".docx":
+                    contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                    break;
+                case ".pptx":
+                    contentType = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+                    break;
+                case ".jpg":
+                case ".jpeg":
+                    contentType = "image/jpeg";
+                    break;
+                case ".png":
+                    contentType = "image/png";
+                    break;
+                case ".gif":
+                    contentType = "image/gif";
+                    break;
+                case ".bmp":
+                    contentType = "image/bmp";
+                    break;
+                case ".svg":
+                    contentType = "image/svg+xml";
+                    break;
+                case ".mp3":
+                    contentType = "audio/mpeg";
+                    break;
+                case ".wav":
+                    contentType = "audio/wav";
+                    break;
+                case ".mp4":
+                    contentType = "video/mp4";
+                    break;
+                case ".avi":
+                    contentType = "video/x-msvideo";
+                    break;
+                default:
+                    contentType = "application/octet-stream";
+                    break;
+            }
+
+            return File(file.Content, contentType, file.path);
+
+
+
+            //return View();
+
         }
 
         //[HttpPost]
